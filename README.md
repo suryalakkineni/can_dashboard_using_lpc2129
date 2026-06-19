@@ -1,8 +1,44 @@
-# CAN Dashboard System using LPC2129 and CAN Protocol
+# 🚗 CAN Dashboard System Using LPC2129
 
-## Overview
+## 📌 Project Title
 
-The CAN Dashboard System is a distributed embedded system developed using LPC2129 microcontrollers and CAN (Controller Area Network) communication. The project simulates an automotive dashboard where different nodes perform dedicated tasks and exchange information through the CAN bus.
+**CAN-Based Automotive Dashboard Monitoring System Using LPC2129 Microcontrollers**
+
+---
+
+# 📖 Abstract
+
+Modern automobiles use multiple Electronic Control Units (ECUs) that communicate through a Controller Area Network (CAN) bus. CAN provides reliable, high-speed communication between different vehicle subsystems while reducing wiring complexity.
+
+This project implements a simplified automotive dashboard using three LPC2129 microcontrollers connected through a CAN network.
+
+The system continuously monitors:
+
+* Engine Temperature
+* Fuel Level
+* Indicator Status
+
+The information is transmitted through the CAN bus and displayed on an LCD dashboard. Indicator control is performed using external interrupts and dedicated LED animations.
+
+This project demonstrates real-time embedded communication, distributed control systems, sensor interfacing, interrupt handling, and CAN protocol implementation.
+
+---
+
+# 🎯 Objectives
+
+The main objectives of this project are:
+
+* To understand CAN Bus communication.
+* To implement distributed node architecture.
+* To monitor fuel level using ADC.
+* To monitor engine temperature using DS18B20.
+* To display vehicle information on LCD.
+* To control indicators using external interrupts.
+* To exchange real-time data between multiple nodes.
+
+---
+
+# 🚘 System Overview
 
 The system consists of three independent nodes:
 
@@ -10,215 +46,148 @@ The system consists of three independent nodes:
 2. Fuel Monitoring Node
 3. Indicator Control Node
 
-The Main Dashboard Node receives data from other nodes and displays vehicle information such as fuel level, engine temperature, and indicator status on an LCD.
+Each node performs a dedicated task and communicates through the CAN network.
 
 ---
 
-# Project Objectives
-
-* Learn CAN Bus communication in embedded systems.
-* Implement distributed node architecture.
-* Interface sensors with LPC2129.
-* Display real-time vehicle parameters on LCD.
-* Control indicator LEDs through CAN messaging.
-* Use external interrupts for switch detection.
-
----
-
-# Hardware Requirements
-
-| Component                  | Purpose                        |
-| -------------------------- | ------------------------------ |
-| LPC2129 Microcontroller    | Main Controller                |
-| MCP2551 CAN Transceiver    | CAN Communication              |
-| DS18B20 Temperature Sensor | Engine Temperature Measurement |
-| Potentiometer              | Fuel Level Simulation          |
-| 16x2/20x4 LCD              | Dashboard Display              |
-| LEDs (8 Nos.)              | Indicator Display              |
-| Push Buttons               | Left/Right Indicator Control   |
-| Crystal Oscillator         | System Clock                   |
-| Power Supply (5V/3.3V)     | Circuit Power                  |
-
----
-
-# Software Requirements
-
-* Embedded C
-* Keil uVision
-* Flash Magic
-* Proteus (Optional for Simulation)
-
----
-
-# System Architecture
+# 🏗 System Architecture
 
 ```text
-                  CAN BUS
---------------------------------------------------
+                         CAN BUS
+--------------------------------------------------------------------------------
 
-     Fuel Node  --------\
-                          \
-                           \
-                            --> Main Dashboard Node
-                           /
-                          /
- Indicator Node --------/
+                    +----------------------+
+                    |  MAIN DASHBOARD NODE |
+                    |      LPC2129         |
+                    +----------+-----------+
+                               |
+                +--------------+--------------+
+                |                             |
+                |                             |
+                V                             V
 
---------------------------------------------------
+     +------------------+         +------------------+
+     |    FUEL NODE     |         | INDICATOR NODE   |
+     |     LPC2129      |         |    LPC2129       |
+     +------------------+         +------------------+
+
+--------------------------------------------------------------------------------
 ```
 
 ---
 
-# Node Descriptions
+# 🔧 Hardware Components
 
-## 1. Main Dashboard Node
+| Component                  | Quantity | Purpose                 |
+| -------------------------- | -------- | ----------------------- |
+| LPC2129 Microcontroller    | 3        | Main Controllers        |
+| MCP2551 CAN Transceiver    | 3        | CAN Communication       |
+| DS18B20 Temperature Sensor | 1        | Temperature Measurement |
+| Potentiometer              | 1        | Fuel Sensor Simulation  |
+| 16x2/20x4 LCD              | 1        | Dashboard Display       |
+| LEDs                       | 8        | Indicator Display       |
+| Push Buttons               | 2        | Indicator Switches      |
+| Crystal Oscillator         | 3        | Clock Generation        |
+| Power Supply               | 1        | System Power            |
+
+---
+
+# 💻 Software Requirements
+
+| Software     | Purpose               |
+| ------------ | --------------------- |
+| Keil uVision | Program Development   |
+| Embedded C   | Firmware Development  |
+| Flash Magic  | Program Download      |
+| Proteus      | Simulation (Optional) |
+
+---
+
+# 📡 Why CAN Protocol?
+
+Controller Area Network (CAN) is widely used in automotive applications because:
+
+* High Reliability
+* Error Detection Mechanism
+* Multi-Master Communication
+* Reduced Wiring
+* Real-Time Performance
+* Low Cost Implementation
+
+---
+
+# 🔹 Node 1 : Main Dashboard Node
+
+## Responsibilities
+
+The Main Dashboard Node acts as the central controller of the system.
 
 ### Functions
 
-* Reads engine temperature from DS18B20.
-* Receives fuel percentage from Fuel Node.
-* Detects LEFT and RIGHT switch presses.
-* Sends indicator commands through CAN.
-* Displays all information on LCD.
-
-### Connected Devices
-
-| Device        | LPC2129 Pin   |
-| ------------- | ------------- |
-| LCD Data Pins | P0.0 - P0.7   |
-| LCD RW        | P0.9          |
-| LCD EN        | P0.10         |
-| LCD RS        | P0.11         |
-| Left Switch   | P0.14 (EINT0) |
-| DS18B20       | P0.15         |
-| Right Switch  | P0.16 (EINT1) |
-| CAN TXD1      | P0.24         |
-| CAN RXD1      | P0.25         |
-
-### LCD Display Example
-
-```text
-<<< DASH BOARD >>>
-
-Fuel : 75%
-Indicator  < >
-Temp : 28 C
-```
+* Reads engine temperature from DS18B20
+* Receives fuel percentage from Fuel Node
+* Detects Left and Right switch presses
+* Sends indicator commands through CAN
+* Displays complete dashboard information on LCD
 
 ---
 
-## 2. Fuel Monitoring Node
+## Hardware Connections
 
-### Functions
+### LCD Interface
 
-* Reads fuel sensor value using ADC.
-* Converts ADC value into fuel percentage.
-* Sends fuel percentage to Main Dashboard Node using CAN.
+| LCD Pin | LPC2129 Pin |
+| ------- | ----------- |
+| D0-D7   | P0.0 - P0.7 |
+| RW      | P0.9        |
+| EN      | P0.10       |
+| RS      | P0.11       |
 
-### ADC Working
+### Switch Connections
 
-The fuel sensor is simulated using a potentiometer.
+| Switch       | LPC2129 Pin   |
+| ------------ | ------------- |
+| Left Switch  | P0.14 (EINT0) |
+| Right Switch | P0.16 (EINT1) |
 
-```text
-ADC Range     : 0 - 1023
-Voltage Range : 0V - 3.3V
-```
+### Sensor Connection
 
-Fuel Percentage Calculation:
+| Sensor  | LPC2129 Pin |
+| ------- | ----------- |
+| DS18B20 | P0.15       |
 
-```c
-Fuel_Percentage = (ADC_Value * 100) / 1023;
-```
+### CAN Connection
 
-### ADC Channels
-
-| Channel | Pin   |
-| ------- | ----- |
-| AD0.0   | P0.27 |
-| AD0.1   | P0.28 |
-| AD0.2   | P0.29 |
-| AD0.3   | P0.30 |
-
----
-
-## 3. Indicator Control Node
-
-### Functions
-
-* Receives CAN messages from Main Node.
-* Controls LED indicator animations.
-* Supports LEFT, RIGHT, and OFF modes.
-
-### CAN Commands
-
-| Data | Function        |
-| ---- | --------------- |
-| 'L'  | Left Indicator  |
-| 'R'  | Right Indicator |
-| 'O'  | Indicator OFF   |
-
-### LED Connections
-
-```text
-P0.0 → LED0
-P0.1 → LED1
-P0.2 → LED2
-P0.3 → LED3
-P0.4 → LED4
-P0.5 → LED5
-P0.6 → LED6
-P0.7 → LED7
-```
-
-### Left Indicator Pattern
-
-```text
-LED7 → LED6 → LED5 → LED4 → LED3 → LED2 → LED1 → LED0
-```
-
-### Right Indicator Pattern
-
-```text
-LED0 → LED1 → LED2 → LED3 → LED4 → LED5 → LED6 → LED7
-```
+| Signal   | LPC2129 Pin |
+| -------- | ----------- |
+| CAN TXD1 | P0.24       |
+| CAN RXD1 | P0.25       |
 
 ---
 
-# CAN Communication
+# 🌡 Temperature Monitoring
 
-## CAN Message IDs
+The DS18B20 digital temperature sensor continuously measures engine temperature.
 
-| CAN ID    | Purpose                   |
-| --------- | ------------------------- |
-| 0x11      | Indicator Control Command |
-| Custom ID | Fuel Data Transmission    |
+### Advantages
 
----
+* Digital Sensor
+* High Accuracy
+* One-Wire Interface
+* No ADC Required
 
-## Indicator Data Frame
+### Temperature Calculation
+
+DS18B20 returns:
 
 ```text
-ID      : 0x11
-DLC     : 1
-
-Data:
-'L' -> Left
-'R' -> Right
-'O' -> Off
+Temperature × 16
 ```
-
----
-
-# Temperature Monitoring
-
-The DS18B20 sensor provides temperature data.
 
 Example:
 
 ```text
-Raw Data = Temperature × 16
-
-25°C = 25 << 4
+25°C → 400
 ```
 
 Conversion:
@@ -229,104 +198,304 @@ Temperature = RawValue >> 4;
 
 ---
 
-# Interrupt Configuration
+# ⛽ Node 2 : Fuel Monitoring Node
 
-## External Interrupts
+## Responsibilities
 
-| Interrupt | Pin   | Function               |
-| --------- | ----- | ---------------------- |
-| EINT0     | P0.14 | Left Indicator Switch  |
-| EINT1     | P0.16 | Right Indicator Switch |
-
-### Operation
-
-Pressing a switch:
-
-1. Generates External Interrupt.
-2. Updates indicator state.
-3. Sends CAN message.
-4. Indicator Node receives command.
-5. LEDs animate accordingly.
+* Read fuel sensor value
+* Convert ADC value into percentage
+* Send fuel percentage to Main Node through CAN
 
 ---
 
-# Project Flow
+## Fuel Sensor
+
+A potentiometer is used to simulate the fuel tank sensor.
+
+### ADC Specifications
 
 ```text
-Start
+Resolution : 10-bit
+Range      : 0 – 1023
+Reference  : 3.3V
+```
 
- ↓
+### Fuel Calculation
 
-Initialize LCD
+```c
+fuelPercent = (adcValue * 100) / 1023;
+```
 
- ↓
+### Examples
 
-Initialize CAN
+| ADC Value | Fuel % |
+| --------- | ------ |
+| 0         | 0%     |
+| 256       | 25%    |
+| 512       | 50%    |
+| 768       | 75%    |
+| 1023      | 100%   |
 
- ↓
+---
 
-Read Temperature
+## ADC Connection
 
- ↓
+| ADC Channel | LPC2129 Pin |
+| ----------- | ----------- |
+| AD0.0       | P0.27       |
 
-Receive Fuel Data
+---
 
- ↓
+# 🚦 Node 3 : Indicator Node
 
-Display Information
+## Responsibilities
 
- ↓
+* Receive commands from Main Node
+* Control LED indicators
+* Generate left/right animations
 
-Check Interrupt Events
+---
 
- ↓
+## LED Connections
 
-Send Indicator Commands
+| LED  | Pin  |
+| ---- | ---- |
+| LED0 | P0.0 |
+| LED1 | P0.1 |
+| LED2 | P0.2 |
+| LED3 | P0.3 |
+| LED4 | P0.4 |
+| LED5 | P0.5 |
+| LED6 | P0.6 |
+| LED7 | P0.7 |
 
- ↓
+---
 
-Indicator Node Controls LEDs
+# 🔄 Indicator Operation
 
- ↓
+## LEFT Indicator
 
-Repeat Forever
+```text
+LED7 → LED6 → LED5 → LED4 → LED3 → LED2 → LED1 → LED0
+```
+
+CAN Command:
+
+```text
+'L'
 ```
 
 ---
 
-# Features
+## RIGHT Indicator
 
-* CAN Bus Communication
-* Distributed Node Architecture
-* Real-Time Temperature Monitoring
-* Fuel Level Monitoring
-* LCD Dashboard Display
-* External Interrupt Handling
-* Sequential LED Indicators
-* Modular Embedded C Design
+```text
+LED0 → LED1 → LED2 → LED3 → LED4 → LED5 → LED6 → LED7
+```
+
+CAN Command:
+
+```text
+'R'
+```
 
 ---
 
-# Learning Outcomes
+## OFF State
 
-After completing this project, you will understand:
+```text
+All LEDs OFF
+```
 
-* CAN Protocol Fundamentals
-* LPC2129 Peripheral Programming
+CAN Command:
+
+```text
+'O'
+```
+
+---
+
+# 📨 CAN Communication
+
+## Fuel Data Frame
+
+```text
+ID      : 0x01
+DLC     : 4
+Data1   : Fuel Percentage
+```
+
+Example:
+
+```text
+ID = 0x01
+Data1 = 75
+```
+
+---
+
+## Indicator Command Frame
+
+```text
+ID      : 0x11
+DLC     : 1
+```
+
+Commands:
+
+```text
+'L' = Left Indicator
+'R' = Right Indicator
+'O' = Indicator OFF
+```
+
+---
+
+# ⚡ Interrupt Handling
+
+Two external interrupts are used.
+
+| Interrupt | Pin   | Function        |
+| --------- | ----- | --------------- |
+| EINT0     | P0.14 | Left Indicator  |
+| EINT1     | P0.16 | Right Indicator |
+
+### Interrupt Process
+
+```text
+Button Press
+      ↓
+External Interrupt
+      ↓
+Update Indicator State
+      ↓
+Transmit CAN Message
+      ↓
+Indicator Node Receives Command
+      ↓
+LED Pattern Executes
+```
+
+---
+
+# 📟 LCD Output
+
+Normal Display:
+
+```text
+--------------------------------
+<<< DASH BOARD >>>
+
+Fuel : 75 %
+
+Indicator  < >
+
+Temp : 30 C
+--------------------------------
+```
+
+---
+
+# 🔄 Complete Project Flow
+
+```text
+START
+   │
+   ▼
+Initialize LCD
+   │
+Initialize CAN
+   │
+Initialize ADC
+   │
+Initialize DS18B20
+   │
+Wait for Events
+   │
+ ┌───────────────┬────────────────┐
+ │               │                │
+ ▼               ▼                ▼
+
+Read Fuel    Read Temp      Switch Press
+
+ │               │                │
+
+ ▼               ▼                ▼
+
+Send CAN      Display       Send Indicator
+Message       Data          Command
+
+ │               │                │
+
+ └───────────────┴────────────────┘
+
+               │
+
+               ▼
+
+          Update LCD
+
+               │
+
+               ▼
+
+            Repeat
+```
+
+---
+
+# ✅ Features
+
+* CAN Based Communication
+* Distributed Node Architecture
+* Real-Time Fuel Monitoring
+* Real-Time Temperature Monitoring
+* LCD Dashboard Interface
+* Interrupt-Based Indicator Control
+* LED Animation
+* Embedded C Firmware
+* Automotive Dashboard Simulation
+
+---
+
+# 🎓 Learning Outcomes
+
+Through this project, we learned:
+
+* CAN Protocol Implementation
+* LPC2129 Programming
 * ADC Interfacing
 * DS18B20 Interfacing
 * LCD Interfacing
-* External Interrupts
-* Embedded C Programming
-* Automotive Dashboard Concepts
-* Distributed Embedded Systems
+* Interrupt Programming
+* Embedded C Development
+* Automotive Embedded Systems
+* Real-Time Communication Networks
 
 ---
 
-# Author
+# 🔮 Future Enhancements
+
+* Vehicle Speed Monitoring
+* RPM Measurement
+* OBD Integration
+* GPS Tracking
+* GSM Alerts
+* Touchscreen Dashboard
+* Data Logging to SD Card
+* Bluetooth Connectivity
+* Mobile App Integration
+
+---
+
+# 👨‍💻 Author
 
 **Naga Sai Durga Surya Lakkineni**
 
+Bachelor of Technology (B.Tech)
+
 Embedded Systems Project
 
-**CAN Dashboard System using LPC2129**
+**CAN Dashboard System Using LPC2129 and CAN Protocol**
+
+Year: 2026
