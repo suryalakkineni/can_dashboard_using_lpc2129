@@ -1,0 +1,9 @@
+--cpu ARM7TDMI
+".\startup.o"
+".\can.o"
+".\delay.o"
+".\node2.o"
+--strict --scatter ".\node2.sct"
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\node2.map" -o .\node2.axf

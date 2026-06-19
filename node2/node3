@@ -1,0 +1,101 @@
+/******************************************************************************
+ * Project    : CAN Dashboard System
+ * File       : node3_fuel.c
+ * Controller : LPC2129
+ *
+ * DESCRIPTION:
+ * ------------
+ * Fuel Node continuously reads the fuel sensor value using ADC,
+ * converts it into fuel percentage (0-100%), and transmits the
+ * fuel percentage to the Main Node through CAN bus.
+ *
+ * HARDWARE:
+ * ---------
+ * Fuel Sensor (Potentiometer) --> ADC Channel 0
+ * CAN1 TX --> P0.24
+ * CAN1 RX --> P0.25
+ *
+ * CAN FRAME:
+ * ----------
+ * ID      : 0x01
+ * Data1   : Fuel Percentage (0-100)
+ * DLC     : 4
+ *
+ ******************************************************************************/
+
+#include <LPC21xx.h>
+
+#include "types.h"
+#include "Major_adc.h"
+#include "Major_adc_defines.h"
+#include "Major_Can.h"
+#include "Major_candefines.h"
+#include "delay.h"
+
+/*---------------- Global Variables ----------------*/
+
+f32 voltage;          /* ADC input voltage */
+u32 adcValue;         /* Raw ADC value (0-1023) */
+u8 fuelPercent;       /* Fuel percentage (0-100) */
+
+CANF txFrame;         /* CAN transmit frame */
+
+/******************************************************************************
+ * MAIN FUNCTION
+ ******************************************************************************/
+int main(void)
+{
+    /*--------------------------------------------------
+      Initialize CAN Controller
+    --------------------------------------------------*/
+    Init_CAN1();
+
+    /*--------------------------------------------------
+      Initialize ADC Channel 0
+    --------------------------------------------------*/
+    initadc(0);
+
+    /*--------------------------------------------------
+      Configure CAN Frame
+    --------------------------------------------------*/
+    txFrame.ID = 0x01;      /* Fuel Node CAN ID */
+    txFrame.BFV.RTR = 0;    /* Data Frame */
+    txFrame.BFV.DLC = 4;    /* Data Length Code */
+
+    while(1)
+    {
+        /************************************************
+         * Read ADC Channel 0
+         ************************************************/
+        Read_ADC(0, &voltage, &adcValue);
+
+        /************************************************
+         * Convert ADC Value to Fuel Percentage
+         *
+         * ADC Range  : 0 - 1023
+         * Fuel Range : 0 - 100 %
+         ************************************************/
+        fuelPercent = (adcValue * 100) / 1023;
+
+        /* Safety limit */
+        if(fuelPercent > 100)
+        {
+            fuelPercent = 100;
+        }
+
+        /************************************************
+         * Load Fuel Percentage into CAN Data Byte
+         ************************************************/
+        txFrame.Data1 = fuelPercent;
+
+        /************************************************
+         * Transmit CAN Frame
+         ************************************************/
+        CAN1_Tx(txFrame);
+
+        /************************************************
+         * Transmit every 100 ms
+         ************************************************/
+        delay_ms(100);
+    }
+}
