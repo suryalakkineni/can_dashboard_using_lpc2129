@@ -490,9 +490,7 @@ Through this project, we learned:
 
 # 👨‍💻 Author
 
-**Naga Sai Durga Surya Lakkineni**
-
-Bachelor of Technology (B.Tech)
+**Surya Lakkineni**
 
 Embedded Systems Project
 
